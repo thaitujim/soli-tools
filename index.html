@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo Web App</title>
+  <title>Login</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1 class="title">Danh sách sản phẩm</h1>
+  <div class="login-box">
+    <h2>Đăng nhập</h2>
 
-  <div id="list" class="list"></div>
+    <input id="username" type="text" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
 
-  <footer>
-    Host miễn phí bằng GitHub Pages 🚀
-  </footer>
+    <button onclick="login()">Login</button>
+
+    <p id="msg" class="msg"></p>
+  </div>
 
   <script src="app.js"></script>
 </body>
