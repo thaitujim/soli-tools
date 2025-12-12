@@ -13,7 +13,7 @@ const CONFIG = {
     // In production, use a proper authentication system
     USERS: {
         'admin': 'password123',
-        'user': 'user123'
+        'user': '123'
     },
     
     // Session Settings

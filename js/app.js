@@ -2,12 +2,6 @@
 
 class App {
     constructor() {
-        this.dataForm = document.getElementById('data-form');
-        this.formMessage = document.getElementById('form-message');
-        this.dataModal = document.getElementById('data-modal');
-        this.addDataBtn = document.getElementById('add-data-btn');
-        this.closeModalBtn = document.getElementById('close-modal-btn');
-        this.cancelBtn = document.getElementById('cancel-btn');
         this.ingredientFilter = document.getElementById('ingredient-filter');
         this.chartsContainer = document.getElementById('charts-container');
         this.charts = {};
@@ -19,57 +13,16 @@ class App {
     
     init() {
         // Attach event listeners
-        if (this.dataForm) this.dataForm.addEventListener('submit', (e) => this.handleSubmit(e));
-        if (this.addDataBtn) this.addDataBtn.addEventListener('click', () => this.openModal());
-        if (this.closeModalBtn) this.closeModalBtn.addEventListener('click', () => this.closeModal());
-        if (this.cancelBtn) this.cancelBtn.addEventListener('click', () => this.closeModal());
         if (this.ingredientFilter) this.ingredientFilter.addEventListener('change', (e) => this.filterCharts(e.target.value));
         
         // Load data when app initializes
         this.loadData();
     }
     
-    handleSubmit(e) {
-        e.preventDefault();
-        
-        const formData = {
-            name: document.getElementById('name').value,
-            value: document.getElementById('value').value
-        };
-        
-        this.submitData(formData);
-    }
-    
-    async submitData(data) {
-        try {
-            this.showMessage('Submitting...', 'info');
-            
-            const url = new URL(CONFIG.APPS_SCRIPT_URL);
-            url.searchParams.append('action', 'appendData');
-            url.searchParams.append('data', JSON.stringify(data));
-            
-            const response = await fetch(url.toString(), {
-                method: 'GET'
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                this.showMessage('Data submitted successfully!', 'success');
-                this.dataForm.reset();
-                // Reload data after submission
-                setTimeout(() => this.loadData(), 1000);
-            } else {
-                this.showMessage('Error: ' + result.message, 'error');
-            }
-        } catch (error) {
-            console.error('Error submitting data:', error);
-            this.showMessage('Error submitting data. Please try again.', 'error');
-        }
-    }
-    
     async loadData() {
         try {
+            this.showLoading();
+            
             const url = new URL(CONFIG.APPS_SCRIPT_URL);
             url.searchParams.append('action', 'getData');
             
@@ -90,6 +43,8 @@ class App {
         } catch (error) {
             console.error('Error loading data:', error);
             this.renderEmptyState();
+        } finally {
+            this.hideLoading();
         }
     }
     
@@ -209,28 +164,19 @@ class App {
     sanitizeId(str) {
         return str.replace(/[^a-zA-Z0-9]/g, '_');
     }
-
-    openModal() {
-        if (this.dataModal) this.dataModal.style.display = 'flex';
+    
+    showLoading() {
+        if (!this.chartsContainer) return;
+        this.chartsContainer.innerHTML = `
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Loading data...</p>
+            </div>
+        `;
     }
     
-    closeModal() {
-        if (this.dataModal) this.dataModal.style.display = 'none';
-            this.formMessage.className = 'message';
-        }
-        if (this.dataForm) this.dataForm.reset();
-    }
-    
-    showMessage(text, type) {
-        this.formMessage.textContent = text;
-        this.formMessage.className = 'message ' + type;
-        
-        if (type === 'success') {
-            setTimeout(() => {
-                this.formMessage.textContent = '';
-                this.formMessage.className = 'message';
-            }, 3000);
-        }
+    hideLoading() {
+        // Loading will be cleared when charts are rendered
     }
     
     escapeHtml(text) {
