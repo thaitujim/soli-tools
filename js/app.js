@@ -3,9 +3,17 @@
 class App {
     constructor() {
         this.dataForm = document.getElementById('data-form');
-        this.dataList = document.getElementById('data-list');
-        this.refreshBtn = document.getElementById('refresh-btn');
         this.formMessage = document.getElementById('form-message');
+        this.dataModal = document.getElementById('data-modal');
+        this.modalBackdrop = document.getElementById('modal-backdrop');
+        this.addDataBtn = document.getElementById('add-data-btn');
+        this.closeModalBtn = document.getElementById('close-modal-btn');
+        this.cancelBtn = document.getElementById('cancel-btn');
+        this.ingredientFilter = document.getElementById('ingredient-filter');
+        this.chartsContainer = document.getElementById('charts-container');
+        this.charts = {};
+        this.chartData = [];
+        this.groupedData = {};
         
         this.init();
     }
@@ -13,7 +21,11 @@ class App {
     init() {
         // Attach event listeners
         this.dataForm.addEventListener('submit', (e) => this.handleSubmit(e));
-        this.refreshBtn.addEventListener('click', () => this.loadData());
+        if (this.addDataBtn) this.addDataBtn.addEventListener('click', () => this.openModal());
+        if (this.closeModalBtn) this.closeModalBtn.addEventListener('click', () => this.closeModal());
+        if (this.cancelBtn) this.cancelBtn.addEventListener('click', () => this.closeModal());
+        if (this.modalBackdrop) this.modalBackdrop.addEventListener('click', () => this.closeModal());
+        if (this.ingredientFilter) this.ingredientFilter.addEventListener('change', (e) => this.filterCharts(e.target.value));
         
         // Load data when app initializes
         this.loadData();
@@ -24,9 +36,7 @@ class App {
         
         const formData = {
             name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            message: document.getElementById('message').value,
-            timestamp: new Date().toLocaleString()
+            value: document.getElementById('value').value
         };
         
         this.submitData(formData);
@@ -36,12 +46,12 @@ class App {
         try {
             this.showMessage('Submitting...', 'info');
             
-            const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'appendData',
-                    data: data
-                })
+            const url = new URL(CONFIG.APPS_SCRIPT_URL);
+            url.searchParams.append('action', 'appendData');
+            url.searchParams.append('data', JSON.stringify(data));
+            
+            const response = await fetch(url.toString(), {
+                method: 'GET'
             });
             
             const result = await response.json();
@@ -62,42 +72,159 @@ class App {
     
     async loadData() {
         try {
-            this.dataList.innerHTML = '<p class="loading">Loading data...</p>';
+            const url = new URL(CONFIG.APPS_SCRIPT_URL);
+            url.searchParams.append('action', 'getData');
             
-            const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'getData'
-                })
+            const response = await fetch(url.toString(), {
+                method: 'GET'
             });
             
             const result = await response.json();
             
             if (result.success && result.data && result.data.length > 0) {
-                this.displayData(result.data);
+                this.chartData = result.data;
+                this.groupDataByType();
+                this.populateFilter();
+                this.renderCharts('all');
             } else {
-                this.dataList.innerHTML = '<p class="loading">No data found</p>';
+                this.renderEmptyState();
             }
         } catch (error) {
             console.error('Error loading data:', error);
-            this.dataList.innerHTML = '<p class="loading">Error loading data. Please check your Google Apps Script URL.</p>';
+            this.renderEmptyState();
         }
     }
     
-    displayData(data) {
-        this.dataList.innerHTML = '';
-        
-        data.forEach((item, index) => {
-            const dataItem = document.createElement('div');
-            dataItem.className = 'data-item';
-            dataItem.innerHTML = `
-                <div class="data-item-name">${this.escapeHtml(item.name)}</div>
-                <div class="data-item-email">${this.escapeHtml(item.email)}</div>
-                <div class="data-item-message">${this.escapeHtml(item.message)}</div>
-                ${item.timestamp ? `<div class="data-item-timestamp" style="color: #999; font-size: 12px; margin-top: 8px;">${item.timestamp}</div>` : ''}
-            `;
-            this.dataList.appendChild(dataItem);
+    groupDataByType() {
+        this.groupedData = {};
+        this.chartData.forEach(item => {
+            const type = item.IngredientType || 'Unknown';
+            if (!this.groupedData[type]) {
+                this.groupedData[type] = [];
+            }
+            this.groupedData[type].push(item);
         });
+    }
+    
+    populateFilter() {
+        if (!this.ingredientFilter) return;
+        
+        // Clear existing options except "Show All"
+        this.ingredientFilter.innerHTML = '<option value="all">Show All</option>';
+        
+        // Add option for each ingredient type
+        Object.keys(this.groupedData).sort().forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            this.ingredientFilter.appendChild(option);
+        });
+    }
+    
+    filterCharts(selectedType) {
+        this.renderCharts(selectedType);
+    }
+    
+    renderCharts(filterType = 'all') {
+        if (!this.chartsContainer) return;
+        
+        // Destroy existing charts
+        Object.values(this.charts).forEach(chart => chart.destroy());
+        this.charts = {};
+        
+        // Clear container
+        this.chartsContainer.innerHTML = '';
+        
+        // Determine which types to display
+        const typesToDisplay = filterType === 'all' 
+            ? Object.keys(this.groupedData) 
+            : [filterType];
+        
+        // Create a chart for each type
+        typesToDisplay.forEach(type => {
+            if (!this.groupedData[type]) return;
+            
+            const chartItem = document.createElement('div');
+            chartItem.className = 'chart-item';
+            chartItem.innerHTML = `
+                <h3>${this.escapeHtml(type)}</h3>
+                <canvas id="chart-${this.sanitizeId(type)}"></canvas>
+            `;
+            this.chartsContainer.appendChild(chartItem);
+            
+            // Create chart
+            const canvas = document.getElementById(`chart-${this.sanitizeId(type)}`);
+            if (canvas) {
+                this.createChart(canvas, type, this.groupedData[type]);
+            }
+        });
+    }
+    
+    createChart(canvas, type, data) {
+        const ctx = canvas.getContext('2d');
+        
+        const labels = data.map(item => item.IngredientDetails || '');
+        const values = data.map(item => parseFloat(item.IngredientQuantity) || 0);
+        
+        this.charts[type] = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Quantity',
+                    data: values,
+                    backgroundColor: '#667eea',
+                    borderColor: '#5568d3',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { 
+                    legend: { display: true, position: 'top' },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#333',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        },
+                        formatter: (value) => value
+                    }
+                },
+                scales: { 
+                    y: { beginAtZero: true }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+    
+    renderEmptyState() {
+        if (!this.chartsContainer) return;
+        this.chartsContainer.innerHTML = '<p class="loading">No data available</p>';
+    }
+    
+    sanitizeId(str) {
+        return str.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    openModal() {
+        if (this.dataModal) this.dataModal.style.display = 'flex';
+        if (this.modalBackdrop) this.modalBackdrop.style.display = 'block';
+    }
+
+    closeModal() {
+        if (this.dataModal) this.dataModal.style.display = 'none';
+        if (this.modalBackdrop) this.modalBackdrop.style.display = 'none';
+        if (this.formMessage) {
+            this.formMessage.textContent = '';
+            this.formMessage.className = 'message';
+        }
+        if (this.dataForm) this.dataForm.reset();
     }
     
     showMessage(text, type) {

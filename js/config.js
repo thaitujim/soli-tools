@@ -3,11 +3,11 @@
 // Google Apps Script Deployment URL
 // Replace this with your actual Google Apps Script deployment URL
 const CONFIG = {
-    APPS_SCRIPT_URL: 'https://script.google.com/macros/d/AKfycbwcrPpy0haKXqKEtck6XeuZqjxgSf59tSh4tLh1eLhCg-_0V5t9An329aTPI5yrBDOOXQ/userweb/exec',
+    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzV4YVBPSm84U8PR-2l_bGU1TQJZnO05LGTNw--EhcrxvIRcqistwgsqoRGvSLQHTMl/exec',
     
     // Google Sheet ID
     // Replace this with your actual Google Sheet ID
-    SHEET_ID: '1FWnFpQEGsdFddRGTsZnBEqb0b98_dOap-kOc_Nx0FeM',
+    SHEET_ID: '1P553_BHlYbViOH7_G2IsIw7YN-E4V2TbFbXVIqESgx4',
     
     // Login Credentials (Hardcoded for demo purposes)
     // In production, use a proper authentication system
