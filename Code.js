@@ -35,6 +35,42 @@ function appendData(data) {
 }
 
 /**
+ * Update data in the Google Sheet
+ */
+function updateData(updates) {
+    try {
+        const sheet = getSheet();
+        const lastRow = sheet.getLastRow();
+        
+        if (lastRow <= 2) {
+            return createResponse(false, 'No data to update');
+        }
+        
+        // Get all existing data starting from row 3
+        const existingData = sheet.getRange(3, 1, lastRow - 2, 3).getValues();
+        
+        // Update matching rows
+        let updatedCount = 0;
+        updates.forEach(update => {
+            for (let i = 0; i < existingData.length; i++) {
+                const row = existingData[i];
+                if (row[0] === update.IngredientType && row[1] === update.IngredientDetails) {
+                    // Update quantity in column C (index 2)
+                    const rowNumber = i + 3; // +3 because we start from row 3
+                    sheet.getRange(rowNumber, 3).setValue(update.IngredientQuantity);
+                    updatedCount++;
+                    break;
+                }
+            }
+        });
+        
+        return createResponse(true, `Successfully updated ${updatedCount} items`);
+    } catch (error) {
+        return createResponse(false, 'Error updating data: ' + error.message);
+    }
+}
+
+/**
  * Get all data from the Google Sheet
  */
 function getData() {
@@ -108,6 +144,9 @@ function doGet(e) {
         if (action === 'appendData' && dataParam) {
             const data = JSON.parse(dataParam);
             return appendData(data);
+        } else if (action === 'updateData' && dataParam) {
+            const updates = JSON.parse(dataParam);
+            return updateData(updates);
         } else if (action === 'getData') {
             return getData();
         } else {

@@ -35,7 +35,7 @@
             <div class="chart-section">
                 <div class="chart-header">
                     <h2>Data Statistics</h2>
-                    <div class="chart-filter">
+                    <div class="chart-filter" style="display: none;">
                         <label for="ingredient-filter">Filter by Type:</label>
                         <select id="ingredient-filter">
                             <option value="all">Show All</option>
@@ -48,6 +48,27 @@
             <div class="actions-section">
                 <!-- Temporarily hidden add button -->
                 <!-- <button id="add-data-btn" class="btn-primary">+ Add New Data</button> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Modal for Editing Quantities -->
+    <div id="input-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nhập dữ liệu nguyên liệu</h2>
+                <span class="close-btn" id="close-input-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="display-type">
+                    <label class="readonly-label">Loại nguyên liệu:</label>
+                    <div class="readonly-field" id="display-type"></div>
+                </div>
+                <div id="ingredients-list" class="ingredients-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-input-btn" class="btn-save">Lưu thay đổi</button>
+                <button id="cancel-input-btn" class="btn-cancel">Hủy thay đổi</button>
             </div>
         </div>
     </div>

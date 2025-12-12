@@ -246,6 +246,141 @@ body {
     .login-box {
         padding: 30px 20px;
     }
+    
+    .container {
+        margin: 10px;
+    }
+    
+    /* Dashboard mobile optimization */
+    .dashboard-content {
+        padding: 15px;
+    }
+    
+    .chart-section {
+        padding: 15px;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .chart-header h2 {
+        font-size: 18px;
+    }
+    
+    .chart-filter {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .chart-filter select {
+        width: 100%;
+    }
+    
+    /* Chart items mobile optimization */
+    .chart-item {
+        padding: 15px;
+    }
+    
+    .chart-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .chart-item h3 {
+        font-size: 15px;
+    }
+    
+    .btn-input-data {
+        width: 100%;
+        padding: 10px;
+    }
+    
+    .chart-item canvas {
+        max-height: 250px;
+    }
+    
+    /* Modal mobile optimization */
+    .modal-content {
+        width: 95%;
+        max-height: 85vh;
+        margin: 0 10px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-header h2 {
+        font-size: 16px;
+    }
+    
+    #data-form {
+        padding: 20px;
+    }
+    
+    .modal-body .ingredient-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .modal-body .ingredient-item label {
+        width: 100%;
+    }
+    
+    .modal-body .ingredient-item input {
+        width: 100%;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+    
+    .container {
+        margin: 5px;
+    }
+    
+    .app-header {
+        padding: 15px 20px;
+    }
+    
+    .app-header h1 {
+        font-size: 18px;
+    }
+    
+    .dashboard-content {
+        padding: 10px;
+    }
+    
+    .chart-section {
+        padding: 10px;
+    }
+    
+    .chart-item {
+        padding: 10px;
+    }
+    
+    .chart-item canvas {
+        max-height: 200px;
+    }
+    
+    .btn-logout {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
 }
 
 /* Dashboard Content */
@@ -315,13 +450,41 @@ body {
 }
 
 .chart-item h3 {
-    margin: 0 0 15px 0;
+    margin: 0;
     color: #667eea;
     font-size: 16px;
 }
 
+.chart-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
 .chart-item canvas {
     max-height: 300px;
+}
+
+.btn-input-data {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-input-data:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+.btn-input-data:active {
+    transform: translateY(0);
 }
 
 .actions-section {
@@ -357,9 +520,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
 }
 
@@ -375,13 +536,12 @@ body {
 
 .modal-content {
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 5px 40px rgba(0, 0, 0, 0.3);
-    max-width: 500px;
-    width: 90%;
-    max-height: 90vh;
+    width: 100%;
+    height: 100%;
     overflow-y: auto;
     z-index: 1001;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-header {
@@ -427,21 +587,56 @@ body {
 
 .modal-footer {
     display: flex;
-    gap: 10px;
-    padding-top: 20px;
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px 20px;
     border-top: 1px solid #e0e0e0;
 }
 
 .modal-footer button {
-    flex: 1;
-}
-
-.modal-footer .btn-secondary {
     width: 100%;
 }
 
-.modal-footer .btn-submit {
-    width: 100%;
+.btn-save {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-save:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+}
+
+.btn-cancel {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.btn-cancel:active {
+    transform: translateY(0);
 }
 
 /* Loading Animation */
@@ -472,4 +667,111 @@ body {
     color: #666;
     font-size: 14px;
     margin: 0;
+}
+
+/* Input Modal Specific Styles */
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 30px;
+}
+
+.modal-body .display-type {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.modal-body .readonly-label {
+    display: block;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.modal-body .readonly-field {
+    font-size: 18px;
+    color: #333;
+    font-weight: 700;
+    padding: 5px 0;
+}
+
+.modal-body .ingredients-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.modal-body .ingredient-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    transition: background-color 0.2s;
+}
+
+.modal-body .ingredient-item:hover {
+    background-color: #e9ecef;
+}
+
+.modal-body .ingredient-item label {
+    flex: 1;
+    margin: 0;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.modal-body .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modal-body .quantity-controls .quantity-input {
+    width: 80px;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.modal-body .quantity-controls .quantity-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.modal-body .btn-quantity {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: white;
+    color: #667eea;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-body .btn-quantity:hover {
+    background-color: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.modal-body .btn-quantity:active {
+    transform: scale(0.95);
 }
