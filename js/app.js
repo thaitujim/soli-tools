@@ -5,7 +5,6 @@ class App {
         this.dataForm = document.getElementById('data-form');
         this.formMessage = document.getElementById('form-message');
         this.dataModal = document.getElementById('data-modal');
-        this.modalBackdrop = document.getElementById('modal-backdrop');
         this.addDataBtn = document.getElementById('add-data-btn');
         this.closeModalBtn = document.getElementById('close-modal-btn');
         this.cancelBtn = document.getElementById('cancel-btn');
@@ -20,11 +19,10 @@ class App {
     
     init() {
         // Attach event listeners
-        this.dataForm.addEventListener('submit', (e) => this.handleSubmit(e));
+        if (this.dataForm) this.dataForm.addEventListener('submit', (e) => this.handleSubmit(e));
         if (this.addDataBtn) this.addDataBtn.addEventListener('click', () => this.openModal());
         if (this.closeModalBtn) this.closeModalBtn.addEventListener('click', () => this.closeModal());
         if (this.cancelBtn) this.cancelBtn.addEventListener('click', () => this.closeModal());
-        if (this.modalBackdrop) this.modalBackdrop.addEventListener('click', () => this.closeModal());
         if (this.ingredientFilter) this.ingredientFilter.addEventListener('change', (e) => this.filterCharts(e.target.value));
         
         // Load data when app initializes
@@ -214,14 +212,10 @@ class App {
 
     openModal() {
         if (this.dataModal) this.dataModal.style.display = 'flex';
-        if (this.modalBackdrop) this.modalBackdrop.style.display = 'block';
     }
-
+    
     closeModal() {
         if (this.dataModal) this.dataModal.style.display = 'none';
-        if (this.modalBackdrop) this.modalBackdrop.style.display = 'none';
-        if (this.formMessage) {
-            this.formMessage.textContent = '';
             this.formMessage.className = 'message';
         }
         if (this.dataForm) this.dataForm.reset();
